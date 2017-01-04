@@ -4,18 +4,21 @@
 	"description": "Displays additional information on tooltips of Pokémon Showdown.",
 	"version": "0.0.0.1",
 	"manifest_version": 2,
+	"icons": { 
+		"32": "icon32.png"
+	},
 	"permissions": [
 		"*://play.pokemonshowdown.com/*",
 		"*://*.psim.us/*"
 	],
 	"web_accessible_resources": [
-		"tooltip.js"
+		"/js/tooltip.js"
 	],
 	"content_scripts": [
 		{
 			"matches": ["*://play.pokemonshowdown.com/*", "*://*.psim.us/*"],
-			"css": ["style.css"],
-			"js": ["main.js"]
+			"css": ["/css/style.css"],
+			"js": ["/js/main.js"]
 		}
 	]
 }
