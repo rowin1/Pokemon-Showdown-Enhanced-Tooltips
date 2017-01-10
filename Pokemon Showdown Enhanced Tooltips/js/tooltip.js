@@ -414,3 +414,13 @@ ShowdownEnhancedTooltip.typeChart = {
 		HPivs: {"atk":30, "def":30, "spa":30}
 	}
 };
+
+ShowdownEnhancedTooltip.getWeakness = function(types){
+	
+}
+
+ShowdownEnhancedTooltip.showPokemonTooltip = function(pokemon, myPokemon, isActive){
+	console.log(pokemon);
+}
+
+BattleTooltips.prototype.showPokemonTooltip = EnhancedTooltip.showPokemonTooltip;
