@@ -17,8 +17,8 @@
 	"content_scripts": [
 		{
 			"matches": ["*://play.pokemonshowdown.com/*", "*://*.psim.us/*"],
-			"css": ["css\style.css"],
-			"js": ["js\main.js"]
+			"css": ["css\\style.css"],
+			"js": ["js\\main.js"]
 		}
 	]
 }
