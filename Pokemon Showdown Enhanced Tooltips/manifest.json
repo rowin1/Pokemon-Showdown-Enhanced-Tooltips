@@ -11,6 +11,9 @@
 		"*://play.pokemonshowdown.com/*",
 		"*://*.psim.us/*"
 	],
+	"web_accessible_resources": [
+		"/js/tooltip.js"
+	],
 	"content_scripts": [
 		{
 			"matches": ["*://play.pokemonshowdown.com/*", "*://*.psim.us/*"],
