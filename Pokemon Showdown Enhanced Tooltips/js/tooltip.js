@@ -423,4 +423,4 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function(pokemon, myPokemon, isActi
 	console.log(pokemon);
 }
 
-BattleTooltips.prototype.showPokemonTooltip = EnhancedTooltip.showPokemonTooltip;
+BattleTooltips.prototype.showPokemonTooltip = ShowdownEnhancedTooltip.showPokemonTooltip;
