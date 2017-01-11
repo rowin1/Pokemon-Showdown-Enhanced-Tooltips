@@ -647,7 +647,6 @@ ShowdownEnhancedTooltip.getTypeEff = function(types){
 
 	for(var index in damage) {
 		var eff = damage[index];
-
 		typeEff[eff].push(index);
 	}
 
