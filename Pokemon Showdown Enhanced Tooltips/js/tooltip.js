@@ -3,19 +3,19 @@ var ShowdownEnhancedTooltip = {};
 ShowdownEnhancedTooltip.BattleTypeChart = {
 	// defending type
 	"Bug": {
-		damageTaken: {
-			// attacking type : effectivenessMultiplier
+		damageGiven: {
+			// attacking type & effectivenessMultiplier
 			"Bug": 1,
 			"Dark": 1,
 			"Dragon": 1,
 			"Electric": 1,
 			"Fairy": 1,
-			"Fighting": .5,
+			"Fighting": 0.5,
 			"Fire": 2,
 			"Flying": 2,
 			"Ghost": 1,
-			"Grass": .5,
-			"Ground": .5,
+			"Grass": 0.5,
+			"Ground": 0.5,
 			"Ice": 1,
 			"Normal": 1,
 			"Poison": 1,
@@ -29,16 +29,15 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Dark": {
 		damageGiven: {
-			prankster: 3,
 			"Bug": 2,
-			"Dark": .5,
+			"Dark": 0.5,
 			"Dragon": 1,
 			"Electric": 1,
 			"Fairy": 2,
 			"Fighting": 2,
 			"Fire": 1,
 			"Flying": 1,
-			"Ghost": .5,
+			"Ghost": 0.5,
 			"Grass": 1,
 			"Ground": 1,
 			"Ice": 1,
@@ -56,13 +55,13 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 			"Bug": 1,
 			"Dark": 1,
 			"Dragon": 2,
-			"Electric": .5,
+			"Electric": 0.5,
 			"Fairy": 2,
 			"Fighting": 1,
 			"Fire": .5,
 			"Flying": 1,
 			"Ghost": 1,
-			"Grass": .5,
+			"Grass": 0.5,
 			"Ground": 1,
 			"Ice": 2,
 			"Normal": 1,
@@ -70,22 +69,21 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 			"Psychic": 1,
 			"Rock": 1,
 			"Steel": 1,
-			"Water": .5,
+			"Water": 0.5,
 		},
 		HPivs: {"atk":30},
 		HPdvs: {"def":14},
 	},
 	"Electric": {
 		damageGiven: {
-			par: 3,
 			"Bug": 1,
 			"Dark": 1,
 			"Dragon": 1,
-			"Electric": .5,
+			"Electric": 0.5,
 			"Fairy": 1,
 			"Fighting": 1,
 			"Fire": 1,
-			"Flying": .5,
+			"Flying": 0.5,
 			"Ghost": 1,
 			"Grass": 1,
 			"Ground": 2,
@@ -94,7 +92,7 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 			"Poison": 1,
 			"Psychic": 1,
 			"Rock": 1,
-			"Steel": .5,
+			"Steel": 0.5,
 			"Water": 1,
 		},
 		HPivs: {"spa":30},
@@ -148,7 +146,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Fire": {
 		damageGiven: {
-			brn: 3,
 			"Bug": 0.5,
 			"Dark": 1,
 			"Dragon": 1,
@@ -197,7 +194,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Ghost": {
 		damageGiven: {
-			trapped: 3,
 			"Bug": 0.5,
 			"Dark": 2,
 			"Dragon": 1,
@@ -222,7 +218,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Grass": {
 		damageGiven: {
-			powder: 3,
 			"Bug": 2,
 			"Dark": 1,
 			"Dragon": 1,
@@ -247,7 +242,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Ground": {
 		damageGiven: {
-			sandstorm: 3,
 			"Bug": 1,
 			"Dark": 1,
 			"Dragon": 1,
@@ -272,8 +266,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Ice": {
 		damageGiven: {
-			hail: 3,
-			frz: 3,
 			"Bug": 1,
 			"Dark": 1,
 			"Dragon": 1,
@@ -320,8 +312,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Poison": {
 		damageGiven: {
-			psn: 3,
-			tox: 3,
 			"Bug": 0.5,
 			"Dark": 1,
 			"Dragon": 1,
@@ -370,7 +360,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Rock": {
 		damageGiven: {
-			sandstorm: 3,
 			"Bug": 1,
 			"Dark": 1,
 			"Dragon": 1,
@@ -395,9 +384,6 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 	"Steel": {
 		damageGiven: {
-			psn: 3,
-			tox: 3,
-			sandstorm: 3,
 			"Bug": 0.5,
 			"Dark": 1,
 			"Dragon": 0.5,
@@ -447,12 +433,15 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 };
 
 ShowdownEnhancedTooltip.showPokemonTooltip = function(pokemon, pokemonData, isActive){
-	console.log(pokemonData);
 	var text = '';
+	
 	var gender = pokemon.gender;
 	if (gender) gender = ' <img src="' + Tools.resourcePrefix + 'fx/gender-' + gender.toLowerCase() + '.png" alt="' + gender + '" />';
+	
 	text = '<div class="tooltipinner"><div class="tooltip">';
-	text += '<h2>' + pokemon.getFullName() + gender + (pokemon.level !== 100 ? ' <small>L' + pokemon.level + '</small>' : '') + '<br />';
+	text += '<h2>' + pokemon.getFullName() + gender + (pokemon.level !== 100 ? ' <small>L' + pokemon.level + '</small>' : '')
+			+ '<small>' + ' ' + Tools.getTemplate(pokemon.species).heightm.toFixed(2) + 'm' + '</small>' + '<small>' + ' ' + Tools.getTemplate(pokemon.species).weightkg + 'kg' + '</small>' + '<br />';
+	text += '<small>' + "Tier: " + Tools.getTemplate(pokemon.species).tier + '</small>' + '<br />';
 
 	var template = pokemon;
 	if (!pokemon.types) template = Tools.getTemplate(pokemon.species);
@@ -488,6 +477,20 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function(pokemon, pokemonData, isAc
 		text += 'Types unknown';
 	}
 	text += '</h2>';
+	
+	var typeEff = ShowdownEnhancedTooltip.getTypeEff(types);
+	text += '<p>Effectiveness: <br />';
+	if (typeEff["4"].length > 0) 
+		text += "<p>4x: " + (typeEff["4"].map(Tools.getTypeIcon).join('')) + "</p>";
+	if (typeEff["2"].length > 0) 
+		text += "<p>2x: " + (typeEff["2"].map(Tools.getTypeIcon).join('')) + "</p>";
+	if (typeEff["0.5"].length > 0) 
+		text += "<p>.5x: " + (typeEff["0.5"].map(Tools.getTypeIcon).join('')) + "</p>";
+	if (typeEff["0.25"].length > 0) 
+		text += "<p>.25x: " + (typeEff["0.25"].map(Tools.getTypeIcon).join('')) + "</p>";
+	text += '</p>';
+	
+	text += '<p class="section">';	
 	if (pokemon.fainted) {
 		text += '<p>HP: (fainted)</p>';
 	} else {
@@ -604,16 +607,51 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function(pokemon, pokemonData, isAc
 	}
 	text += '</div></div>';
 	
-	console.log(pokemon.baseStats);
-	console.log(template.baseStats);
-	
 	return text;
 };
 
-ShowdownEnhancedTooltip.getWeakness = function(types){
+ShowdownEnhancedTooltip.getTypeEff = function(types){
+	if (types.length == 1){
+		var damage = ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven;
+	}else{
+		var damage = {
+			"Bug": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Bug * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Bug,
+			"Dark": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Dark * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Dark,
+			"Dragon": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Dragon * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Dragon,
+			"Electric": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Electric * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Electric,
+			"Fairy": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Fairy * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Fairy,
+			"Fighting": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Fighting * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Fighting,
+			"Fire": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Fire * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Fire,
+			"Flying": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Flying * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Flying,
+			"Ghost": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Ghost * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Ghost,
+			"Grass": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Grass * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Grass,
+			"Ground": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Ground * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Ground,
+			"Ice": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Ice * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Ice,
+			"Normal": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Normal * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Normal,
+			"Poison": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Poison * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Poison,
+			"Psychic": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Psychic * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Psychic,
+			"Rock": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Rock * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Rock,
+			"Steel": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Steel * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Steel,
+			"Water": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Water * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Water,
+		}
+	}
+	
+	var typeEff = {
+	"4": [],
+	"2": [],
+	"1": [],
+	"0.5": [],
+	"0.25": [],
+	"0": []
+	};
 
+	for(var index in damage) {
+		var eff = damage[index];
 
+		typeEff[eff].push(index);
+	}
 
+	return typeEff;
 };
 
 BattleTooltips.prototype.showPokemonTooltip = ShowdownEnhancedTooltip.showPokemonTooltip;
