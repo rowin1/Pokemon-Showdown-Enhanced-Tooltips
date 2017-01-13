@@ -479,7 +479,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function(pokemon, pokemonData, isAc
 	text += '</h2>';
 	
 	var typeEff = ShowdownEnhancedTooltip.getTypeEff(types);
-	text += '<p>Effectiveness: <br />';
+	text += '<p>Weaknesses: <br />';
 	if (typeEff["4"].length > 0) 
 		text += "<p>4x: " + (typeEff["4"].map(Tools.getTypeIcon).join('')) + "</p>";
 	if (typeEff["2"].length > 0) 
