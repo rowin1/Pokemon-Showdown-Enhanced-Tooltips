@@ -5,8 +5,9 @@ A Chrome Extension that enhances the tooltips on [Pokemon Showdown](http://play.
 - Height, weight, tier
 
 ### Example
-![alt text] (header1.png "Without extension")
-![alt text] (header2.png "With extension")
+![alt text] (https://github.com/rowin1/Pokemon-Showdown-Enhanced-Tooltips/blob/master/header1.png)
+
+![alt text] (https://github.com/rowin1/Pokemon-Showdown-Enhanced-Tooltips/blob/master/header2.png)
 
 ### Installation
 - [Download](https://github.com/rowin1/Pokemon-Showdown-Enhanced-Tooltips/archive/master.zip) the latest version of Pokemon Showdown Enhanced Tooltips
