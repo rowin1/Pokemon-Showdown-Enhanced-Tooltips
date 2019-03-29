@@ -1,3 +1,5 @@
+_Fixed and confirmed working as of March 28th, 2019!_
+
 # Pokemon-Showdown-Enhanced-Tooltips
 A Chrome Extension that enhances the tooltips on [Pokemon Showdown](http://play.pokemonshowdown.com/)  by displaying additional information:
 
