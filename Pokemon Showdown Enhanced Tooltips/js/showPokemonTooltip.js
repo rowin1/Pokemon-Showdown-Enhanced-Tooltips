@@ -449,11 +449,15 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += '<h2>' + name + genderBuf + (pokemon.level !== 100 ? ' <small>L' + pokemon.level + '</small>' : '');
     
     // Show height
-	text += '<small>' + ' ' + pokemon.heightm.toFixed(2) + 'm' + '</small>';
+	if (pokemon.heightm) {
+		text += '<small>' + ' ' + pokemon.heightm.toFixed(2) + 'm' + '</small>';
+	}
     //
 
     // Show weight
-    text += '<small>' + ' ' + pokemon.weightkg + 'kg' + '</small>' + '<br />';
+	if (pokemon.weightkg) {
+		text += '<small>' + ' ' + pokemon.weightkg + 'kg' + '</small>' + '<br />';
+	}
     //
 
     var template = this.battle.dex.getTemplate(clientPokemon ? clientPokemon.getSpecies() : pokemon.species);
