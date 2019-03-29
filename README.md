@@ -13,4 +13,4 @@ A Chrome Extension that enhances the tooltips on [Pokemon Showdown](http://play.
 
 ### Installation
 - [Download](https://github.com/rowin1/Pokemon-Showdown-Enhanced-Tooltips/archive/master.zip) the latest version of Pokemon Showdown Enhanced Tooltips
-- Extract Pokemon-Showdown-Enhanced-Tooltips-master and drag and drop the "Pokemon Showdown Enhanced Tooltips" folder into your Chrome extension page.
+- Extract Pokemon-Showdown-Enhanced-Tooltips-master and drag and drop the "Pokemon Showdown Enhanced Tooltips" folder into your Chrome extension page. Make sure your Chrome is in developer mode (upper right toggle when on the extension page)
