@@ -17,3 +17,4 @@ A Chrome Extension that enhances the tooltips on [Pokemon Showdown](http://play.
 
 ### Contributing
 Bug reports and pull requests are welcome!  If you'd like to request a feature, please open an issue.  This project is intended to be a safe, welcoming space for collaboration. 
+
