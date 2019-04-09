@@ -6,6 +6,9 @@ A Chrome Extension that enhances the tooltips on [Pokemon Showdown](http://play.
 - Type weaknesses and respective multipliers
 - Height and weight
 
+Optional settings (right click the extension icon and toggle the setting!):
+- Base stats
+
 ### Example
 ![Screenshot](/screenshots/screenshot-PS.png)
 
