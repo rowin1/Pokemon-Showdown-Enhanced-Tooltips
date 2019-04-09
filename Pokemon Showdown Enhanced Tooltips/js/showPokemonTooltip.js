@@ -1,5 +1,9 @@
 let ShowdownEnhancedTooltip = {};
 
+ShowdownEnhancedTooltip.Settings = {
+	showBaseStats: document.getElementById('pset-showBaseStats').getAttribute('enabled')
+};
+
 ShowdownEnhancedTooltip.BattleTypeChart = {
 	// defending type
 	"Bug": {
@@ -475,6 +479,18 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
         text += '<small>(Type changed)</small><br />';
     }
     text += types.map(function (type) { return Dex.getTypeIcon(type); }).join(' ');
+
+    // Show base stats
+		if (ShowdownEnhancedTooltip.Settings.showBaseStats === "ON") {
+			text += '<br /><small>Base stats:' + '<br />';
+			text += 'HP: ' + pokemon.baseStats.hp + ' ';
+			text += 'Atk: ' + pokemon.baseStats.atk + ' ';
+			text += 'Def: ' + pokemon.baseStats.def + ' ';
+			text += 'SpA: ' + pokemon.baseStats.spa + ' ';
+			text += 'SpD: ' + pokemon.baseStats.spd + ' ';
+			text += 'Spe: ' + pokemon.baseStats.spe + '</small>'
+		}
+
     text += '</h2>';
 
     // Show type effectiveness icons

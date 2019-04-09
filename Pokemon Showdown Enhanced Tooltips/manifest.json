@@ -21,6 +21,7 @@
 	},
 	"permissions": [
 		"contextMenus",
+		"storage",
 		"*://play.pokemonshowdown.com/*",
 		"*://*.psim.us/*"
 	],
