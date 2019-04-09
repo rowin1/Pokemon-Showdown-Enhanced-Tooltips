@@ -11,10 +11,17 @@
 		"64": "/icons/icon64.png",
 		"128": "/icons/icon128.png"
 	},
+	"background": {
+		"scripts": [
+			"/js/settingsMenu.js"
+		]
+	},
 	"browser_action":{
 		"default_icon": "/icons/icon.png"
 	},
 	"permissions": [
+		"contextMenus",
+		"storage",
 		"*://play.pokemonshowdown.com/*",
 		"*://*.psim.us/*"
 	],
