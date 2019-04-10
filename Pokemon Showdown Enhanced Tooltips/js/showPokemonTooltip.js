@@ -483,12 +483,12 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     // Show base stats
 		if (ShowdownEnhancedTooltip.Settings.showBaseStats === "ON") {
 			text += '<br /><small>Base stats:' + '<br />';
-			text += 'HP: ' + pokemon.baseStats.hp + ' ';
-			text += 'Atk: ' + pokemon.baseStats.atk + ' ';
-			text += 'Def: ' + pokemon.baseStats.def + ' ';
-			text += 'SpA: ' + pokemon.baseStats.spa + ' ';
-			text += 'SpD: ' + pokemon.baseStats.spd + ' ';
-			text += 'Spe: ' + pokemon.baseStats.spe + '</small>'
+			text += 'HP: ' + template.baseStats.hp + ' ';
+			text += 'Atk: ' + template.baseStats.atk + ' ';
+			text += 'Def: ' + template.baseStats.def + ' ';
+			text += 'SpA: ' + template.baseStats.spa + ' ';
+			text += 'SpD: ' + template.baseStats.spd + ' ';
+			text += 'Spe: ' + template.baseStats.spe + '</small>'
 		}
 
     text += '</h2>';
