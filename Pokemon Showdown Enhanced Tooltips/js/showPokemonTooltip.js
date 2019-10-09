@@ -588,9 +588,9 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     if (serverPokemon && !isActive) {
 
         text += '<p class="section">';
-        var battlePokemon = this.battle.getPokemon(pokemon.ident, pokemon.details); for (var _i4 = 0, _serverPokemon$moves =
-            serverPokemon.moves; _i4 < _serverPokemon$moves.length; _i4++) {
-                var _moveid = _serverPokemon$moves[_i4];
+        var battlePokemon = this.battle.getPokemon(pokemon.ident, pokemon.details);
+        for (var _i4 = 0, _serverPokemon$moves = serverPokemon.moves; _i4 < _serverPokemon$moves.length; _i4++) {
+        	  var _moveid = _serverPokemon$moves[_i4];
             var move = Dex.getMove(_moveid);
             var moveName = '&#8226; ' + move.name;
             if (battlePokemon && battlePokemon.moveTrack) {
@@ -603,19 +603,20 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
                     }
                 }
             }
-            text += moveName + '<br />';
+            text += moveName + ', Base power: ' + move.basePower + ' ' + Dex.getTypeIcon(move.type) + '<br />';
         }
         text += '</p>';
     } else if (!this.battle.hardcoreMode && clientPokemon && clientPokemon.moveTrack.length) {
 
-        text += '<p class="section">'; for (var _i6 = 0, _clientPokemon$moveTr =
-            clientPokemon.moveTrack; _i6 < _clientPokemon$moveTr.length; _i6++) {
-                var _row = _clientPokemon$moveTr[_i6];
-            text += this.getPPUseText(_row) + '<br />';
+        text += '<p class="section">';
+        for (var _i6 = 0, _clientPokemon$moveTr = clientPokemon.moveTrack; _i6 < _clientPokemon$moveTr.length; _i6++) {
+						var _row = _clientPokemon$moveTr[_i6];
+						var move = Dex.getMove(_row[0]);
+            text += this.getPPUseText(_row) + ' Base power: ' + move.basePower + ' ' + Dex.getTypeIcon(move.type) + '<br />';
         }
         if (clientPokemon.moveTrack.filter(function (_ref) {
-            var moveName = _ref[0]; return (
-                moveName.charAt(0) !== '*' && !_this3.battle.dex.getMove(moveName).isZ);
+            var moveName = _ref[0];
+            return (moveName.charAt(0) !== '*' && !_this3.battle.dex.getMove(moveName).isZ);
         }).
             length > 4) {
             text += '(More than 4 moves is usually a sign of Illusion Zoroark/Zorua.)';
