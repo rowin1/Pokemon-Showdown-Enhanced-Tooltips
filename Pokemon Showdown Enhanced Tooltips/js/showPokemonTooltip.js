@@ -436,6 +436,29 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 };
 
+ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
+	let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
+	const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
+	buf += `<strong><a href="https://www.smogon.com/dex/sm/pokemon/${pokemon.id}/" target="_blank" style="color: #222222; text-decoration: none;">${BattleLog.escapeHTML(ignoreNick ? pokemon.species : pokemon.name)}</a>`;
+	let gender = pokemon.gender;
+	if (gender) {
+		buf += ` <img src="${Dex.resourcePrefix}fx/gender-${gender.toLowerCase()}.png" alt="${gender}" />`;
+	}
+	buf += (pokemon.level === 100 ? `` : ` <small>L${pokemon.level}</small>`);
+
+	let symbol = '';
+	if (pokemon.species.indexOf('-Mega') >= 0) symbol = 'mega';
+	else if (pokemon.species === 'Kyogre-Primal') symbol = 'alpha';
+	else if (pokemon.species === 'Groudon-Primal') symbol = 'omega';
+	if (symbol) {
+		buf += ` <img src="${Dex.resourcePrefix}sprites/misc/${symbol}.png" alt="${symbol}" style="vertical-align:text-bottom;" />`;
+	}
+
+	buf += `</strong><div class="hpbar"><div class="hptext"></div><div class="hptextborder"></div><div class="prevhp"><div class="hp"></div></div><div class="status"></div>`;
+	buf += `</div>`;
+	return buf;
+}
+
 ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive) {
     var _this3 = this;
     var pokemon = clientPokemon || serverPokemon;
@@ -451,7 +474,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     }
 
     text += '<h2>' + name + genderBuf + (pokemon.level !== 100 ? ' <small>L' + pokemon.level + '</small>' : '');
-    
+
     // Show height
 	if (pokemon.heightm) {
 		text += '<small>' + ' ' + pokemon.heightm.toFixed(2) + 'm' + '</small>';
@@ -603,7 +626,10 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
                     }
                 }
             }
-            text += moveName + ', Base power: ' + move.basePower + ' ' + Dex.getTypeIcon(move.type) + '<br />';
+            text += moveName + ', Base power: ' + move.basePower + ' ' +
+							Dex.getTypeIcon(move.type) + ' ' +
+							`<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
+							'<br />';
         }
         text += '</p>';
     } else if (!this.battle.hardcoreMode && clientPokemon && clientPokemon.moveTrack.length) {
@@ -612,7 +638,10 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
         for (var _i6 = 0, _clientPokemon$moveTr = clientPokemon.moveTrack; _i6 < _clientPokemon$moveTr.length; _i6++) {
 						var _row = _clientPokemon$moveTr[_i6];
 						var move = Dex.getMove(_row[0]);
-            text += this.getPPUseText(_row) + ' Base power: ' + move.basePower + ' ' + Dex.getTypeIcon(move.type) + '<br />';
+            text += this.getPPUseText(_row) + ' Base power: ' + move.basePower + ' ' +
+							Dex.getTypeIcon(move.type) + ' ' +
+							`<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
+							'<br />';
         }
         if (clientPokemon.moveTrack.filter(function (_ref) {
             var moveName = _ref[0];
@@ -655,7 +684,7 @@ ShowdownEnhancedTooltip.getTypeEff = function(types){
 			"Water": ShowdownEnhancedTooltip.BattleTypeChart[types[0]].damageGiven.Water * ShowdownEnhancedTooltip.BattleTypeChart[types[1]].damageGiven.Water,
 		}
 	}
-	
+
 	var typeEff = {
 	"4": [],
 	"2": [],
@@ -674,4 +703,5 @@ ShowdownEnhancedTooltip.getTypeEff = function(types){
 };
 
 // Overwrite client tooltip method with enhanced tooltip method
+PokemonSprite.prototype.getStatbarHTML = ShowdownEnhancedTooltip.getStatbarHTML;
 BattleTooltips.prototype.showPokemonTooltip = ShowdownEnhancedTooltip.showPokemonTooltip;
