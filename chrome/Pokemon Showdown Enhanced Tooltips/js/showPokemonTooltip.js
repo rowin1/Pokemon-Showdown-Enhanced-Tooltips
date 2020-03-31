@@ -438,225 +438,233 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 
 ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
 	let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
-	const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
-	buf += `<strong><a href="https://www.smogon.com/dex/sm/pokemon/${pokemon.id}/" target="_blank" style="color: #222222; text-decoration: none;">${BattleLog.escapeHTML(ignoreNick ? pokemon.species : pokemon.name)}</a>`;
-	let gender = pokemon.gender;
-	if (gender) {
-		buf += ` <img src="${Dex.resourcePrefix}fx/gender-${gender.toLowerCase()}.png" alt="${gender}" />`;
-	}
-	buf += (pokemon.level === 100 ? `` : ` <small>L${pokemon.level}</small>`);
+		const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
 
-	let symbol = '';
-	if (pokemon.species.indexOf('-Mega') >= 0) symbol = 'mega';
-	else if (pokemon.species === 'Kyogre-Primal') symbol = 'alpha';
-	else if (pokemon.species === 'Groudon-Primal') symbol = 'omega';
-	if (symbol) {
-		buf += ` <img src="${Dex.resourcePrefix}sprites/misc/${symbol}.png" alt="${symbol}" style="vertical-align:text-bottom;" />`;
-	}
+		// *****************
+	  // Make pokemon name open smogon link in new tab
+			buf += `<strong><a href="https://www.smogon.com/dex/ss/pokemon/${pokemon.name}/" target="_blank" style="color: #222222; text-decoration: none;">${BattleLog.escapeHTML(ignoreNick ? pokemon.species : pokemon.name)}</a>`;
+		//
 
-	buf += `</strong><div class="hpbar"><div class="hptext"></div><div class="hptextborder"></div><div class="prevhp"><div class="hp"></div></div><div class="status"></div>`;
-	buf += `</div>`;
-	return buf;
-}
+			const gender = pokemon.gender;
+		if (gender === 'M' || gender === 'F') {
+			buf += ` <img src="${Dex.resourcePrefix}fx/gender-${gender.toLowerCase()}.png" alt="${gender}" width="7" height="10" class="pixelated" />`;
+		}
+		buf += (pokemon.level === 100 ? `` : ` <small>L${pokemon.level}</small>`);
 
-ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive) {
-    var _this3 = this;
-    var pokemon = clientPokemon || serverPokemon;
-    var text = '';
-    var genderBuf = '';
-    if (pokemon.gender) {
-        genderBuf = ' <img src="' + Dex.resourcePrefix + 'fx/gender-' + pokemon.gender.toLowerCase() + '.png" alt="' + pokemon.gender + '" />';
-    }
-
-    var name = BattleLog.escapeHTML(pokemon.name);
-    if (pokemon.species !== pokemon.name) {
-        name += ' <small>(' + BattleLog.escapeHTML(pokemon.species) + ')</small>';
-    }
-
-    text += '<h2>' + name + genderBuf + (pokemon.level !== 100 ? ' <small>L' + pokemon.level + '</small>' : '');
-
-    // Show height
-	if (pokemon.heightm) {
-		text += '<small>' + ' ' + pokemon.heightm.toFixed(2) + 'm' + '</small>';
-	}
-    //
-
-    // Show weight
-	if (pokemon.weightkg) {
-		text += '<small>' + ' ' + pokemon.weightkg + 'kg' + '</small>' + '<br />';
-	}
-    //
-
-    var template = this.battle.dex.getTemplate(clientPokemon ? clientPokemon.getSpecies() : pokemon.species);
-    if (clientPokemon && clientPokemon.volatiles.formechange) {
-        if (clientPokemon.volatiles.transform) {
-            text += '<small>(Transformed into ' + clientPokemon.volatiles.formechange[1] + ')</small><br />';
-        } else {
-            text += '<small>(Changed forme: ' + clientPokemon.volatiles.formechange[1] + ')</small><br />';
-        }
-    }
-
-    var types = this.getPokemonTypes(pokemon);
-
-    if (clientPokemon && (clientPokemon.volatiles.typechange || clientPokemon.volatiles.typeadd)) {
-        text += '<small>(Type changed)</small><br />';
-    }
-    text += types.map(function (type) { return Dex.getTypeIcon(type); }).join(' ');
-
-    // Show base stats
-		if (ShowdownEnhancedTooltip.Settings.showBaseStats === "ON") {
-			text += '<br /><small>Base stats:' + '<br />';
-			text += 'HP: ' + template.baseStats.hp + ' ';
-			text += 'Atk: ' + template.baseStats.atk + ' ';
-			text += 'Def: ' + template.baseStats.def + ' ';
-			text += 'SpA: ' + template.baseStats.spa + ' ';
-			text += 'SpD: ' + template.baseStats.spd + ' ';
-			text += 'Spe: ' + template.baseStats.spe + '</small>'
+		let symbol = '';
+		if (pokemon.speciesForme.indexOf('-Mega') >= 0) symbol = 'mega';
+		else if (pokemon.speciesForme === 'Kyogre-Primal') symbol = 'alpha';
+		else if (pokemon.speciesForme === 'Groudon-Primal') symbol = 'omega';
+		if (symbol) {
+			buf += ` <img src="${Dex.resourcePrefix}sprites/misc/${symbol}.png" alt="${symbol}" style="vertical-align:text-bottom;" />`;
 		}
 
-    text += '</h2>';
+		buf += `</strong><div class="hpbar"><div class="hptext"></div><div class="hptextborder"></div><div class="prevhp"><div class="hp"></div></div><div class="status"></div>`;
+		buf += `</div>`;
+		return buf;
+}
 
+ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive, illusionIndex) {
+    var _this3 = this;
+    const pokemon = clientPokemon || serverPokemon;
+		let text = '';
+		let genderBuf = '';
+		const gender = pokemon.gender;
+		if (gender === 'M' || gender === 'F') {
+			genderBuf = ` <img src="${Dex.resourcePrefix}fx/gender-${gender.toLowerCase()}.png" alt="${gender}" width="7" height="10" class="pixelated" /> `;
+		}
+
+		let name = BattleLog.escapeHTML(pokemon.name);
+		if (pokemon.speciesForme !== pokemon.name) {
+			name += ' <small>(' + BattleLog.escapeHTML(pokemon.speciesForme) + ')</small>';
+		}
+
+		// *****
+	// Show height
+	let heightBuf = '';
+		if (pokemon.getSpecies(pokemon).heightm) {
+		heightBuf += '<small>' + ' ' + pokemon.getSpecies(pokemon).heightm.toFixed(2) + 'm' + '</small>';
+	}
+	//
+
+	// ******************
+    // Show weight
+	let weightBuf = '';
+	if (pokemon.getSpecies(pokemon).weightkg) {
+		weightBuf += '<small>' + ' ' + pokemon.getSpecies(pokemon).weightkg + 'kg' + '</small>';
+	}
+    // ******************
+
+		let levelBuf = (pokemon.level !== 100 ? ` <small>L${pokemon.level}</small>` : ``);
+		if (!illusionIndex || illusionIndex === 1) {
+			text += `<h2>${name}${genderBuf}${illusionIndex ? '' : levelBuf}${heightBuf}${weightBuf}<br />`;
+
+			if (clientPokemon?.volatiles.formechange) {
+				if (clientPokemon.volatiles.transform) {
+					text += `<small>(Transformed into ${clientPokemon.volatiles.formechange[1]})</small><br />`;
+				} else {
+					text += `<small>(Changed forme: ${clientPokemon.volatiles.formechange[1]})</small><br />`;
+				}
+			}
+
+			let types = this.getPokemonTypes(pokemon);
+
+			if (clientPokemon && (clientPokemon.volatiles.typechange || clientPokemon.volatiles.typeadd)) {
+				text += `<small>(Type changed)</small><br />`;
+			}
+			text += types.map(type => Dex.getTypeIcon(type)).join(' ');
+
+			// ***********
+	  // Show base stats
+	    var template = clientPokemon ? clientPokemon.getSpecies() : pokemon.getSpecies(pokemon);
+			if (ShowdownEnhancedTooltip.Settings.showBaseStats === "ON") {
+				text += '<br /><small>Base stats:' + '<br />';
+				text += 'HP: ' + template.baseStats.hp + ' ';
+				text += 'Atk: ' + template.baseStats.atk + ' ';
+				text += 'Def: ' + template.baseStats.def + ' ';
+				text += 'SpA: ' + template.baseStats.spa + ' ';
+				text += 'SpD: ' + template.baseStats.spd + ' ';
+				text += 'Spe: ' + template.baseStats.spe + '</small>'
+			}
+	  // **********
+
+			text += `</h2>`;
+		}
+
+		if (illusionIndex) {
+			text += `<p class="section"><strong>Possible Illusion #${illusionIndex}</strong>${levelBuf}</p>`;
+		}
+
+		// ***********************
     // Show type effectiveness icons
+	 	var types = this.getPokemonTypes(pokemon);
     const typeEff = ShowdownEnhancedTooltip.getTypeEff(types);
-    const multiplierKeys = [4, 2, .5, .25, 0]
+    const multiplierKeys = [4, 2, .5, .25, 0];
     text += '<p>Weaknesses: <br />';
     multiplierKeys.forEach((multiplierKey) => {
         if (typeEff[multiplierKey].length > 0) {
             text += `<p>${multiplierKey}x: ` + (typeEff[multiplierKey].map(Dex.getTypeIcon).join('')) + '</p>';
         }
-    })
+    });
     text += '</p><h2></h2>';
-    //
+    // ********************
 
+		if (pokemon.fainted) {
+			text += '<p><small>HP:</small> (fainted)</p>';
+		} else if (this.battle.hardcoreMode) {
+			if (serverPokemon) {
+				text += '<p><small>HP:</small> ' + serverPokemon.hp + '/' + serverPokemon.maxhp + (pokemon.status ? ' <span class="status ' + pokemon.status + '">' + pokemon.status.toUpperCase() + '</span>' : '') + '</p>';
+			}
+		} else {
+			let exacthp = '';
+			if (serverPokemon) {
+				exacthp = ' (' + serverPokemon.hp + '/' + serverPokemon.maxhp + ')';
+			} else if (pokemon.maxhp === 48) {
+				exacthp = ' <small>(' + pokemon.hp + '/' + pokemon.maxhp + ' pixels)</small>';
+			}
+			text += '<p><small>HP:</small> ' + Pokemon.getHPText(pokemon) + exacthp + (pokemon.status ? ' <span class="status ' + pokemon.status + '">' + pokemon.status.toUpperCase() + '</span>' : '');
+			if (clientPokemon) {
+				if (pokemon.status === 'tox') {
+					if (pokemon.ability === 'Poison Heal' || pokemon.ability === 'Magic Guard') {
+						text += ' <small>Would take if ability removed: ' + Math.floor(100 / 16 * Math.min(clientPokemon.statusData.toxicTurns + 1, 15)) + '%</small>';
+					} else {
+						text += ' Next damage: ' + Math.floor(100 / 16 * Math.min(clientPokemon.statusData.toxicTurns + 1, 15)) + '%';
+					}
+				} else if (pokemon.status === 'slp') {
+					text += ' Turns asleep: ' + clientPokemon.statusData.sleepTurns;
+				}
+			}
+			text += '</p>';
+		}
 
-    if (pokemon.fainted) {
-        text += '<p><small>HP:</small> (fainted)</p>';
-    } else if (this.battle.hardcoreMode) {
-        if (serverPokemon) {
-            text += '<p><small>HP:</small> ' + serverPokemon.hp + '/' + serverPokemon.maxhp + (pokemon.status ? ' <span class="status ' + pokemon.status + '">' + pokemon.status.toUpperCase() + '</span>' : '') + '</p>';
-        }
-    } else {
-        var exacthp = '';
-        if (serverPokemon) {
-            exacthp = ' (' + serverPokemon.hp + '/' + serverPokemon.maxhp + ')';
-        } else if (pokemon.maxhp === 48) {
-            exacthp = ' <small>(' + pokemon.hp + '/' + pokemon.maxhp + ' pixels)</small>';
-        }
-        text += '<p><small>HP:</small> ' + Pokemon.getHPText(pokemon) + exacthp + (pokemon.status ? ' <span class="status ' + pokemon.status + '">' + pokemon.status.toUpperCase() + '</span>' : '');
-        if (clientPokemon) {
-            if (pokemon.status === 'tox') {
-                if (pokemon.ability === 'Poison Heal' || pokemon.ability === 'Magic Guard') {
-                    text += ' <small>Would take if ability removed: ' + Math.floor(100 / 16) * Math.min(clientPokemon.statusData.toxicTurns + 1, 15) + '%</small>';
-                } else {
-                    text += ' Next damage: ' + Math.floor(100 / 16) * Math.min(clientPokemon.statusData.toxicTurns + 1, 15) + '%';
-                }
-            } else if (pokemon.status === 'slp') {
-                text += ' Turns asleep: ' + clientPokemon.statusData.sleepTurns;
-            }
-        }
-        text += '</p>';
-    }
+		const supportsAbilities = this.battle.gen > 2 && !this.battle.tier.includes("Let's Go");
 
-    var supportsAbilities = this.battle.gen > 2 && !this.battle.tier.includes("Let's Go");
-    if (serverPokemon) {
-        if (supportsAbilities) {
-            var abilityText = Dex.getAbility(serverPokemon.baseAbility).name;
-            var _ability = Dex.getAbility(serverPokemon.ability || pokemon.ability).name;
-            if (_ability && _ability !== abilityText) {
-                abilityText = _ability + ' (base: ' + abilityText + ')';
-            }
-            text += '<p><small>Ability:</small> ' + abilityText;
-            if (serverPokemon.item) {
-                text += ' / <small>Item:</small> ' + Dex.getItem(serverPokemon.item).name;
-            }
-            text += '</p>';
-        } else if (serverPokemon.item) {
-            var _itemName = Dex.getItem(serverPokemon.item).name;
-            text += '<p><small>Item:</small> ' + _itemName + '</p>';
-        }
-    } else if (clientPokemon) {
-        if (supportsAbilities) {
-            if (!pokemon.baseAbility && !pokemon.ability) {
-                var abilities = template.abilities;
-                text += '<p><small>Possible abilities:</small> ' + abilities['0'];
-                if (abilities['1']) text += ', ' + abilities['1'];
-                if (abilities['H']) text += ', ' + abilities['H'];
-                if (abilities['S']) text += ', ' + abilities['S'];
-                text += '</p>';
-            } else if (pokemon.ability) {
-                if (pokemon.ability === pokemon.baseAbility) {
-                    text += '<p><small>Ability:</small> ' + Dex.getAbility(pokemon.ability).name + '</p>';
-                } else {
-                    text += '<p><small>Ability:</small> ' + Dex.getAbility(pokemon.ability).name + ' (base: ' + Dex.getAbility(pokemon.baseAbility).name + ')' + '</p>';
-                }
-            } else if (pokemon.baseAbility) {
-                text += '<p><small>Ability:</small> ' + Dex.getAbility(pokemon.baseAbility).name + '</p>';
-            }
-        }
-        var _item2 = '';
-        var itemEffect = clientPokemon.itemEffect || '';
-        if (clientPokemon.prevItem) {
-            _item2 = 'None';
-            if (itemEffect) itemEffect += '; ';
-            var prevItem = Dex.getItem(clientPokemon.prevItem).name;
-            itemEffect += clientPokemon.prevItemEffect ? prevItem + ' was ' + clientPokemon.prevItemEffect : 'was ' + prevItem;
-        }
-        if (pokemon.item) _item2 = Dex.getItem(pokemon.item).name;
-        if (itemEffect) itemEffect = ' (' + itemEffect + ')';
-        if (_item2) text += '<p><small>Item:</small> ' + _item2 + itemEffect + '</p>';
-    }
+		let abilityText = '';
+		if (supportsAbilities) {
+			abilityText = this.getPokemonAbilityText(
+				clientPokemon, serverPokemon, isActive, !!illusionIndex && illusionIndex > 1
+			);
+		}
 
-    text += this.renderStats(clientPokemon, serverPokemon, !isActive);
+		let itemText = '';
+		if (serverPokemon?.item) {
+			itemText = '<small>Item:</small> ' + Dex.getItem(serverPokemon.item).name;
+		} else if (clientPokemon) {
+			let item = '';
+			let itemEffect = clientPokemon.itemEffect || '';
+			if (clientPokemon.prevItem) {
+				item = 'None';
+				if (itemEffect) itemEffect += '; ';
+				let prevItem = Dex.getItem(clientPokemon.prevItem).name;
+				itemEffect += clientPokemon.prevItemEffect ? prevItem + ' was ' + clientPokemon.prevItemEffect : 'was ' + prevItem;
+			}
+			if (pokemon.item) item = Dex.getItem(pokemon.item).name;
+			if (itemEffect) itemEffect = ' (' + itemEffect + ')';
+			if (item) itemText = '<small>Item:</small> ' + item + itemEffect;
+		}
 
-    if (serverPokemon && !isActive) {
+		text += '<p>';
+		text += abilityText;
+		if (itemText) {
+			// ability/item on one line for your own switch tooltips, two lines everywhere else
+			text += (!isActive && serverPokemon ? ' / ' : '</p><p>');
+			text += itemText;
+		}
+		text += '</p>';
 
-        text += '<p class="section">';
-        var battlePokemon = this.battle.getPokemon(pokemon.ident, pokemon.details);
-        for (var _i4 = 0, _serverPokemon$moves = serverPokemon.moves; _i4 < _serverPokemon$moves.length; _i4++) {
-        	  var _moveid = _serverPokemon$moves[_i4];
-            var move = Dex.getMove(_moveid);
-            var moveName = '&#8226; ' + move.name;
-            if (battlePokemon && battlePokemon.moveTrack) {
-                for (var _i5 = 0, _battlePokemon$moveTr =
-                    battlePokemon.moveTrack; _i5 < _battlePokemon$moveTr.length; _i5++) {
-                        var row = _battlePokemon$moveTr[_i5];
-                    if (moveName === row[0]) {
-                        moveName = this.getPPUseText(row, true);
-                        break;
-                    }
-                }
-            }
+		text += this.renderStats(clientPokemon, serverPokemon, !isActive);
+
+		if (serverPokemon && !isActive) {
+			// move list
+			text += `<p class="section">`;
+			const battlePokemon = clientPokemon || this.battle.findCorrespondingPokemon(pokemon);
+			for (const moveid of serverPokemon.moves) {
+				const move = Dex.getMove(moveid);
+				let moveName = `&#8226; ${move.name}`;
+				if (battlePokemon?.moveTrack) {
+					for (const row of battlePokemon.moveTrack) {
+						if (moveName === row[0]) {
+							moveName = this.getPPUseText(row, true);
+							break;
+						}
+					}
+				}
+				 // ***************
+					// Show move base power
             text += moveName + ', Base power: ' + move.basePower + ' ' +
 							Dex.getTypeIcon(move.type) + ' ' +
 							`<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
 							'<br />';
-        }
-        text += '</p>';
-    } else if (!this.battle.hardcoreMode && clientPokemon && clientPokemon.moveTrack.length) {
-
-        text += '<p class="section">';
-        for (var _i6 = 0, _clientPokemon$moveTr = clientPokemon.moveTrack; _i6 < _clientPokemon$moveTr.length; _i6++) {
-						var _row = _clientPokemon$moveTr[_i6];
-						var move = Dex.getMove(_row[0]);
-            text += this.getPPUseText(_row) + ' Base power: ' + move.basePower + ' ' +
+            // *********************
+			}
+			text += '</p>';
+		} else if (!this.battle.hardcoreMode && clientPokemon?.moveTrack.length) {
+			// move list (guessed)
+			text += `<p class="section">`;
+			for (const row of clientPokemon.moveTrack) {
+				// *****************
+					 // Show move base power
+						var move = Dex.getMove(row[0]);
+            text += this.getPPUseText(row) + ' Base power: ' + move.basePower + ' ' +
 							Dex.getTypeIcon(move.type) + ' ' +
 							`<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
 							'<br />';
-        }
-        if (clientPokemon.moveTrack.filter(function (_ref) {
-            var moveName = _ref[0];
-            return (moveName.charAt(0) !== '*' && !_this3.battle.dex.getMove(moveName).isZ);
-        }).
-            length > 4) {
-            text += '(More than 4 moves is usually a sign of Illusion Zoroark/Zorua.)';
-        }
-        if (this.battle.gen === 3) {
-            text += '(Pressure is not visible in Gen 3, so in certain situations, more PP may have been lost than shown here.)';
-        }
-        text += '</p>';
-    }
-
-    return text;
+            // *********************
+			}
+			if (clientPokemon.moveTrack.filter(([moveName]) =>
+				moveName.charAt(0) !== '*' && !this.battle.dex.getMove(moveName).isZ
+			).length > 4) {
+				text += `(More than 4 moves is usually a sign of Illusion Zoroark/Zorua.) `;
+			}
+			if (this.battle.gen === 3) {
+				text += `(Pressure is not visible in Gen 3, so in certain situations, more PP may have been lost than shown here.) `;
+			}
+			if (this.pokemonHasClones(clientPokemon)) {
+				text += `(Your opponent has two indistinguishable Pokémon, making it impossible for you to tell which one has which moves/ability/item.) `;
+			}
+			text += `</p>`;
+		}
+		return text;
 };
 
 ShowdownEnhancedTooltip.getTypeEff = function(types){
