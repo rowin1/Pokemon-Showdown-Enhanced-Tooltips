@@ -482,7 +482,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 		// *****
 	// Show height
 	let heightBuf = '';
-		if (pokemon.getSpecies(pokemon).heightm) {
+		if (clientPokemon && pokemon.getSpecies(pokemon).heightm) {
 		heightBuf += '<small>' + ' ' + pokemon.getSpecies(pokemon).heightm.toFixed(2) + 'm' + '</small>';
 	}
 	//
@@ -490,7 +490,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 	// ******************
     // Show weight
 	let weightBuf = '';
-	if (pokemon.getSpecies(pokemon).weightkg) {
+	if (clientPokemon && pokemon.getSpecies(pokemon).weightkg) {
 		weightBuf += '<small>' + ' ' + pokemon.getSpecies(pokemon).weightkg + 'kg' + '</small>';
 	}
     // ******************
@@ -516,8 +516,8 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 
 			// ***********
 	  // Show base stats
-	    var template = clientPokemon ? clientPokemon.getSpecies() : pokemon.getSpecies(pokemon);
-			if (ShowdownEnhancedTooltip.Settings.showBaseStats === "ON") {
+	    var template = clientPokemon ? clientPokemon.getSpecies() : null;
+			if (ShowdownEnhancedTooltip.Settings.showBaseStats === "ON" && template) {
 				text += '<br /><small>Base stats:' + '<br />';
 				text += 'HP: ' + template.baseStats.hp + ' ';
 				text += 'Atk: ' + template.baseStats.atk + ' ';
