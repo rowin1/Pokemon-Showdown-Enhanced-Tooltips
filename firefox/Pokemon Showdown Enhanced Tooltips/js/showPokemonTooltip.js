@@ -499,7 +499,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 		if (!illusionIndex || illusionIndex === 1) {
 			text += `<h2>${name}${genderBuf}${illusionIndex ? '' : levelBuf}${heightBuf}${weightBuf}<br />`;
 
-			if (clientPokemon?.volatiles.formechange) {
+			if (clientPokemon.volatiles.formechange) {
 				if (clientPokemon.volatiles.transform) {
 					text += `<small>(Transformed into ${clientPokemon.volatiles.formechange[1]})</small><br />`;
 				} else {
@@ -587,7 +587,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 		}
 
 		let itemText = '';
-		if (serverPokemon?.item) {
+		if (serverPokemon.item) {
 			itemText = '<small>Item:</small> ' + Dex.getItem(serverPokemon.item).name;
 		} else if (clientPokemon) {
 			let item = '';
@@ -621,7 +621,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 			for (const moveid of serverPokemon.moves) {
 				const move = Dex.getMove(moveid);
 				let moveName = `&#8226; ${move.name}`;
-				if (battlePokemon?.moveTrack) {
+				if (battlePokemon.moveTrack) {
 					for (const row of battlePokemon.moveTrack) {
 						if (moveName === row[0]) {
 							moveName = this.getPPUseText(row, true);
@@ -638,7 +638,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
             // *********************
 			}
 			text += '</p>';
-		} else if (!this.battle.hardcoreMode && clientPokemon?.moveTrack.length) {
+		} else if (!this.battle.hardcoreMode && clientPokemon.moveTrack.length) {
 			// move list (guessed)
 			text += `<p class="section">`;
 			for (const row of clientPokemon.moveTrack) {
