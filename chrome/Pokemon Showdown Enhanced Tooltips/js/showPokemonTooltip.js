@@ -436,29 +436,33 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
 	},
 };
 
-// ********************** Temporarily disabled
-// ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
-// 	let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
-// 	const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
-// 	buf += `<strong><a href="https://www.smogon.com/dex/sm/pokemon/${pokemon.id}/" target="_blank" style="color: #222222; text-decoration: none;">${BattleLog.escapeHTML(ignoreNick ? pokemon.species : pokemon.name)}</a>`;
-// 	let gender = pokemon.gender;
-// 	if (gender) {
-// 		buf += ` <img src="${Dex.resourcePrefix}fx/gender-${gender.toLowerCase()}.png" alt="${gender}" />`;
-// 	}
-// 	buf += (pokemon.level === 100 ? `` : ` <small>L${pokemon.level}</small>`);
-//
-// 	let symbol = '';
-// 	if (pokemon.species.indexOf('-Mega') >= 0) symbol = 'mega';
-// 	else if (pokemon.species === 'Kyogre-Primal') symbol = 'alpha';
-// 	else if (pokemon.species === 'Groudon-Primal') symbol = 'omega';
-// 	if (symbol) {
-// 		buf += ` <img src="${Dex.resourcePrefix}sprites/misc/${symbol}.png" alt="${symbol}" style="vertical-align:text-bottom;" />`;
-// 	}
-//
-// 	buf += `</strong><div class="hpbar"><div class="hptext"></div><div class="hptextborder"></div><div class="prevhp"><div class="hp"></div></div><div class="status"></div>`;
-// 	buf += `</div>`;
-// 	return buf;
-// }
+ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
+	let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
+		const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
+
+		// *****************
+	  // Make pokemon name open smogon link in new tab
+			buf += `<strong><a href="https://www.smogon.com/dex/ss/pokemon/${pokemon.name}/" target="_blank" style="color: #222222; text-decoration: none;">${BattleLog.escapeHTML(ignoreNick ? pokemon.species : pokemon.name)}</a>`;
+		//
+
+			const gender = pokemon.gender;
+		if (gender === 'M' || gender === 'F') {
+			buf += ` <img src="${Dex.resourcePrefix}fx/gender-${gender.toLowerCase()}.png" alt="${gender}" width="7" height="10" class="pixelated" />`;
+		}
+		buf += (pokemon.level === 100 ? `` : ` <small>L${pokemon.level}</small>`);
+
+		let symbol = '';
+		if (pokemon.speciesForme.indexOf('-Mega') >= 0) symbol = 'mega';
+		else if (pokemon.speciesForme === 'Kyogre-Primal') symbol = 'alpha';
+		else if (pokemon.speciesForme === 'Groudon-Primal') symbol = 'omega';
+		if (symbol) {
+			buf += ` <img src="${Dex.resourcePrefix}sprites/misc/${symbol}.png" alt="${symbol}" style="vertical-align:text-bottom;" />`;
+		}
+
+		buf += `</strong><div class="hpbar"><div class="hptext"></div><div class="hptextborder"></div><div class="prevhp"><div class="hp"></div></div><div class="status"></div>`;
+		buf += `</div>`;
+		return buf;
+}
 
 ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive, illusionIndex) {
     var _this3 = this;
@@ -707,5 +711,5 @@ ShowdownEnhancedTooltip.getTypeEff = function(types){
 };
 
 // Overwrite client tooltip method with enhanced tooltip method
-//PokemonSprite.prototype.getStatbarHTML = ShowdownEnhancedTooltip.getStatbarHTML;
+PokemonSprite.prototype.getStatbarHTML = ShowdownEnhancedTooltip.getStatbarHTML;
 BattleTooltips.prototype.showPokemonTooltip = ShowdownEnhancedTooltip.showPokemonTooltip;
