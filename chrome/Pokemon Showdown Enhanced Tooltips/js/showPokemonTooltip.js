@@ -651,7 +651,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 							'<br />';
             // *********************
 			}
-			if (clientPokemon.moveTrack.filter(([moveName]) =>
+			if (this.battle.gen < 8 && clientPokemon.moveTrack.filter(([moveName]) =>
 				moveName.charAt(0) !== '*' && !this.battle.dex.getMove(moveName).isZ
 			).length > 4) {
 				text += `(More than 4 moves is usually a sign of Illusion Zoroark/Zorua.) `;
