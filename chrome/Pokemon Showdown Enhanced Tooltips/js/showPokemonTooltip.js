@@ -543,7 +543,8 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += '<p>Weaknesses: <br />';
     multiplierKeys.forEach((multiplierKey) => {
         if (typeEff[multiplierKey].length > 0) {
-            text += `<p>${multiplierKey}x: ` + (typeEff[multiplierKey].map(Dex.getTypeIcon).join('')) + '</p>';
+            const weakTypes = typeEff[multiplierKey].map(effect => effect ? Dex.getTypeIcon(effect) : '').join('');
+            text += `<p>${multiplierKey}x: ${weakTypes}</p>`;
         }
     });
     text += '</p><h2></h2>';
