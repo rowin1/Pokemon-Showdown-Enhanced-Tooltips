@@ -1,4 +1,4 @@
-_Latest update February 5th, 2020!_
+_Latest update July 13th, 2020!_
 [Chrome Download](https://chrome.google.com/webstore/detail/pok%C3%A9mon-showdown-enhanced/ehfemiiogehggdcmnpinokioccpijcfc)
 [Firefox Download](https://addons.mozilla.org/en-US/firefox/addon/pokemonshowdownenhancedtooltip/)
 
