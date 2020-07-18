@@ -3,7 +3,7 @@ const { fetchChaos } = require('smogon-usage-fetch');
 let ShowdownEnhancedTooltip = {};
 
 ShowdownEnhancedTooltip.Settings = {
-  showBaseStats: 'OFF',
+  showBaseStats: 'ON',
 };
 
 ShowdownEnhancedTooltip.BattleTypeChart = {
@@ -445,8 +445,11 @@ function sumObjectValues(obj) {
 // Get all move data once when plugin loaded
 ShowdownEnhancedTooltip.ChaosData = null;
 const currentTier = app.curRoom.id.split('-')[1];
-const year = '2020';
-const month = '06';
+const days = 36;
+const date = new Date();
+const last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
+const month = ('0' + (last.getMonth() + 1)).slice(-2);
+const year = last.getFullYear();
 fetchChaos(
   { year, month },
   { name: currentTier},
@@ -699,7 +702,6 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += `<p class="section"><small>Likely abilities:</small> ${likelyAbilities.join(', ')}</p>`;
 
     // Likely Moves
-    console.log(pokemonChaosData.Moves);
     const movesTotal = sumObjectValues(pokemonChaosData.Moves);
     const likelyMoves = Object.entries(pokemonChaosData.Moves)
       .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
