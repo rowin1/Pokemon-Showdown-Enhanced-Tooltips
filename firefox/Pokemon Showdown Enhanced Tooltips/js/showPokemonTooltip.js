@@ -543,7 +543,8 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += '<p>Weaknesses: <br />';
     multiplierKeys.forEach((multiplierKey) => {
         if (typeEff[multiplierKey].length > 0) {
-            text += `<p>${multiplierKey}x: ` + (typeEff[multiplierKey].map(Dex.getTypeIcon).join('')) + '</p>';
+            const weakTypes = typeEff[multiplierKey].map(effect => effect ? Dex.getTypeIcon(effect) : '').join('');
+            text += `<p>${multiplierKey}x: ${weakTypes}</p>`;
         }
     });
     text += '</p><h2></h2>';
@@ -651,7 +652,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 							'<br />';
             // *********************
 			}
-			if (clientPokemon.moveTrack.filter(([moveName]) =>
+			if (this.battle.gen < 8 && clientPokemon.moveTrack.filter(([moveName]) =>
 				moveName.charAt(0) !== '*' && !this.battle.dex.getMove(moveName).isZ
 			).length > 4) {
 				text += `(More than 4 moves is usually a sign of Illusion Zoroark/Zorua.) `;
