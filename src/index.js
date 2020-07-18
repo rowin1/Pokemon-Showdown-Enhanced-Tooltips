@@ -1,11 +1,4 @@
-const {
-  fetchChaos,
-  fetchFormats,
-  fetchLeads,
-  fetchMetagame,
-  fetchTimeframes,
-  fetchUsage
-} = require('smogon-usage-fetch');
+const { fetchChaos } = require('smogon-usage-fetch');
 
 let ShowdownEnhancedTooltip = {};
 
@@ -445,7 +438,12 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
   },
 };
 
+function sumObjectValues(obj) {
+  return Object.keys(obj).reduce((sum, key)=> sum+parseFloat(obj[key]||0), 0);
+}
+
 // Get all move data once when plugin loaded
+ShowdownEnhancedTooltip.ChaosData = null;
 const currentTier = app.curRoom.id.split('-')[1];
 const year = '2020';
 const month = '06';
@@ -454,7 +452,7 @@ fetchChaos(
   { name: currentTier},
   'https://cors-anywhere.herokuapp.com/'
 ).then(chaos => {
-  localStorage.setItem(`${year}-${month}-${currentTier}`, JSON.stringify(chaos));
+  ShowdownEnhancedTooltip.ChaosData = chaos.data;
 })
 .catch(console.error);
 
@@ -687,10 +685,30 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += `</p>`;
   }
 
-  let chaosData = localStorage.getItem(`${year}-${month}-${currentTier}`);
-  if (chaosData) {
-    chaosData = JSON.parse(chaosData);
-    console.log(chaosData);
+  if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)]) {
+    const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)];
+
+    // Likely Abilities
+    const abilityTotal = sumObjectValues(pokemonChaosData.Abilities);
+    const likelyAbilities = Object.entries(pokemonChaosData.Abilities)
+      .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
+      .map(abilityArray => {
+        const abilityLikelihood = Math.round(((abilityArray[1] / abilityTotal)*100) * 100) / 100;
+        return `${abilityArray[0]} (${abilityLikelihood}%)`;
+      });
+    text += `<p class="section"><small>Likely abilities:</small> ${likelyAbilities.join(', ')}</p>`;
+
+    // Likely Moves
+    console.log(pokemonChaosData.Moves);
+    const movesTotal = sumObjectValues(pokemonChaosData.Moves);
+    const likelyMoves = Object.entries(pokemonChaosData.Moves)
+      .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
+      .map(movesArray => {
+        const movesLikelihood = Math.round(((movesArray[1] / movesTotal)*100) * 100) / 100;
+        return `${movesArray[0]} (${movesLikelihood}%)`;
+      })
+      .slice(0, 7);
+    text += `<p class="section"><small>Likely moves:</small><br/>• ${likelyMoves.join('<br/> • ')}</p>`;
   }
 
   return text;
