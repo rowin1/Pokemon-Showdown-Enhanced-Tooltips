@@ -1,7 +1,7 @@
 let ShowdownEnhancedTooltip = {};
 
 ShowdownEnhancedTooltip.Settings = {
-	showBaseStats: document.getElementById('pset-showBaseStats').getAttribute('enabled')
+	showBaseStats: 'OFF',
 };
 
 ShowdownEnhancedTooltip.BattleTypeChart = {
@@ -588,7 +588,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 		}
 
 		let itemText = '';
-		if (serverPokemon.item) {
+		if (serverPokemon && serverPokemon.item) {
 			itemText = '<small>Item:</small> ' + Dex.getItem(serverPokemon.item).name;
 		} else if (clientPokemon) {
 			let item = '';

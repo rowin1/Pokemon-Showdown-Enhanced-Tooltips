@@ -1,7 +1,7 @@
 let ShowdownEnhancedTooltip = {};
 
 ShowdownEnhancedTooltip.Settings = {
-	showBaseStats: document.getElementById('pset-showBaseStats').getAttribute('enabled')
+	showBaseStats: 'OFF',
 };
 
 ShowdownEnhancedTooltip.BattleTypeChart = {
