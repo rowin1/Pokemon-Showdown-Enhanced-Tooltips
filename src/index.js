@@ -1,3 +1,12 @@
+const {
+  fetchChaos,
+  fetchFormats,
+  fetchLeads,
+  fetchMetagame,
+  fetchTimeframes,
+  fetchUsage
+} = require('smogon-usage-fetch');
+
 let ShowdownEnhancedTooltip = {};
 
 ShowdownEnhancedTooltip.Settings = {
@@ -436,6 +445,19 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
   },
 };
 
+// Get all move data once when plugin loaded
+const currentTier = app.curRoom.id.split('-')[1];
+const year = '2020';
+const month = '06';
+fetchChaos(
+  { year, month },
+  { name: currentTier},
+  'https://cors-anywhere.herokuapp.com/'
+).then(chaos => {
+  localStorage.setItem(`${year}-${month}-${currentTier}`, JSON.stringify(chaos));
+})
+.catch(console.error);
+
 ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
   let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
   const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
@@ -465,7 +487,6 @@ ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
 }
 
 ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive, illusionIndex) {
-  var _this3 = this;
   const pokemon = clientPokemon || serverPokemon;
   let text = '';
   let genderBuf = '';
@@ -665,6 +686,13 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     }
     text += `</p>`;
   }
+
+  let chaosData = localStorage.getItem(`${year}-${month}-${currentTier}`);
+  if (chaosData) {
+    chaosData = JSON.parse(chaosData);
+    console.log(chaosData);
+  }
+
   return text;
 };
 
