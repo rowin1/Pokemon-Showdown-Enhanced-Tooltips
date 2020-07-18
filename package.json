@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Enhanced tooltips for Pokemon Showdown in Chrome and Firefox",
   "scripts": {
-    "build": "webpack"
+    "build": "webpack",
+    "watch": "webpack --watch"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
