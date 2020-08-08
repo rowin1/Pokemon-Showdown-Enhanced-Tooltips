@@ -663,12 +663,12 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += '</p>';
   } else if (!this.battle.hardcoreMode && clientPokemon && clientPokemon.moveTrack.length) {
     // move list (guessed)
-    text += `<p class="section">`;
+    text += `<p class="section"><strong>Known moves:</strong><br/>`;
     for (const row of clientPokemon.moveTrack) {
       // *****************
       // Show move base power
       var move = Dex.getMove(row[0]);
-      text += this.getPPUseText(row) + ' Base power: ' + move.basePower + ' ' +
+      text += this.getPPUseText(row) + ' BP: ' + move.basePower + ' ' +
         Dex.getTypeIcon(move.type) + ' ' +
         `<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
         '<br />';
@@ -685,36 +685,74 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     if (this.pokemonHasClones(clientPokemon)) {
       text += `(Your opponent has two indistinguishable Pokémon, making it impossible for you to tell which one has which moves/ability/item.) `;
     }
+
+    // Likely Moves
+    if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)]) {
+      const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)];
+      const movesTotal = sumObjectValues(pokemonChaosData.Moves);
+      const likelyMoves = Object.entries(pokemonChaosData.Moves)
+        .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
+        .slice(0, 7) // Only showing the 7 most likely moves
+        .filter(movesArray => {
+          for (const row of clientPokemon.moveTrack) {
+            let move = Dex.getMove(row[0]);
+            if (move.id === movesArray[0]) {
+              return false;
+            }
+          }
+          return true;
+        })
+        .map(movesArray => {
+          const movesLikelihood = Math.round(((movesArray[1] / movesTotal)*100) * 100) / 100;
+          const move = Dex.getMove(movesArray[0]);
+          return `${move.name} (${movesLikelihood}%) BP: ${move.basePower} ${Dex.getTypeIcon(move.type)} <img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />`;
+        });
+      text += `<br/><strong>Likely moves:</strong><br/>• ${likelyMoves.join('<br/> • ')}`;
+    }
     text += `</p>`;
   }
 
-  if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)]) {
-    const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)];
+  return text;
+};
 
-    // Likely Abilities
+ShowdownEnhancedTooltip.getPokemonAbilityText = function(
+  clientPokemon,
+  serverPokemon,
+  isActive,
+  hidePossible
+) {
+  let text = '';
+  const abilityData = this.getPokemonAbilityData(clientPokemon, serverPokemon);
+  if (!isActive) {
+    // for switch tooltips, only show the original ability
+    const ability = abilityData.baseAbility || abilityData.ability;
+    if (ability) text = '<small>Ability:</small> ' + Dex.getAbility(ability).name;
+  } else {
+    if (abilityData.ability) {
+      const abilityName = Dex.getAbility(abilityData.ability).name;
+      text = '<small>Ability:</small> ' + abilityName;
+      const baseAbilityName = Dex.getAbility(abilityData.baseAbility).name;
+      if (baseAbilityName && baseAbilityName !== abilityName) text += ' (base: ' + baseAbilityName + ')';
+    }
+  }
+
+  if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(clientPokemon.speciesForme)]) {
+    const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(clientPokemon.speciesForme)];
+
+    // Enhanced Possible Abilities
     const abilityTotal = sumObjectValues(pokemonChaosData.Abilities);
     const likelyAbilities = Object.entries(pokemonChaosData.Abilities)
       .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
       .map(abilityArray => {
         const abilityLikelihood = Math.round(((abilityArray[1] / abilityTotal)*100) * 100) / 100;
-        return `${abilityArray[0]} (${abilityLikelihood}%)`;
+        return `${Dex.getAbility(abilityArray[0]).name} (${abilityLikelihood}%)`;
       });
-    text += `<p class="section"><small>Likely abilities:</small> ${likelyAbilities.join(', ')}</p>`;
-
-    // Likely Moves
-    const movesTotal = sumObjectValues(pokemonChaosData.Moves);
-    const likelyMoves = Object.entries(pokemonChaosData.Moves)
-      .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
-      .map(movesArray => {
-        const movesLikelihood = Math.round(((movesArray[1] / movesTotal)*100) * 100) / 100;
-        return `${movesArray[0]} (${movesLikelihood}%)`;
-      })
-      .slice(0, 7);
-    text += `<p class="section"><small>Likely moves:</small><br/>• ${likelyMoves.join('<br/> • ')}</p>`;
+    text = '<small>Possible abilities:</small> ' + likelyAbilities.join(', ');
+  } else if (!text && abilityData.possibilities.length && !hidePossible) {
+    text = '<small>Possible abilities:</small> ' + abilityData.possibilities.join(', ');
   }
-
   return text;
-};
+}
 
 ShowdownEnhancedTooltip.getTypeEff = function(types){
   if (types.length == 1){
@@ -761,4 +799,5 @@ ShowdownEnhancedTooltip.getTypeEff = function(types){
 
 // Overwrite client tooltip method with enhanced tooltip method
 PokemonSprite.prototype.getStatbarHTML = ShowdownEnhancedTooltip.getStatbarHTML;
+BattleTooltips.prototype.getPokemonAbilityText = ShowdownEnhancedTooltip.getPokemonAbilityText;
 BattleTooltips.prototype.showPokemonTooltip = ShowdownEnhancedTooltip.showPokemonTooltip;
