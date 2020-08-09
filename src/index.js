@@ -461,6 +461,8 @@ const getChaosData = () => {
       .catch(console.error);
   }
 }
+// Right now this only loads when you refresh the page.
+getChaosData();
 
 ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
   let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
@@ -491,7 +493,6 @@ ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
 }
 
 ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive, illusionIndex) {
-  getChaosData();
   const pokemon = clientPokemon || serverPokemon;
   let text = '';
   let genderBuf = '';
