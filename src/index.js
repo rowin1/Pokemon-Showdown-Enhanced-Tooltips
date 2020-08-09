@@ -706,7 +706,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
   }
   // Likely Moves
   const pokemonChaosData = getChaosDataFromLocal(pokemon.speciesForme);
-  if (pokemonChaosData) {
+  if (pokemonChaosData && clientPokemon) {
     const movesTotal = sumObjectValues(pokemonChaosData.Moves);
     const likelyMoves = Object.entries(pokemonChaosData.Moves)
       .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
