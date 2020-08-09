@@ -438,16 +438,10 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
   },
 };
 
-function sumObjectValues(obj) {
-  return Object.keys(obj).reduce((sum, key)=> sum+parseFloat(obj[key]||0), 0);
-}
-
 ShowdownEnhancedTooltip.ChaosData = null;
-ShowdownEnhancedTooltip.CurrentRoom = null;
-const getChaosData = () => {
-  if (app.curRoom.id !== ShowdownEnhancedTooltip.CurrentRoom) {
-    ShowdownEnhancedTooltip.CurrentRoom = app.curRoom.id;
-    const currentTier = app.curRoom.id.split('-')[1];
+
+const getChaosData = (currentTier) => {
+  if (currentTier) {
     const days = 36;
     const date = new Date();
     const last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
@@ -461,8 +455,27 @@ const getChaosData = () => {
       .catch(console.error);
   }
 }
-// Right now this only loads when you refresh the page.
-getChaosData();
+
+if (app && app.curRoom && app.curRoom.id) {
+  const initialTier = app.curRoom.id.split('-')[1];
+  if (initialTier) {
+    getChaosData(initialTier);
+  }
+}
+
+addEventListener('currentTier', function (e) {
+  getChaosData(e.detail);
+}, false);
+
+function sumObjectValues(obj) {
+  return Object.keys(obj).reduce((sum, key)=> sum+parseFloat(obj[key]||0), 0);
+}
+
+function getChaosDataFromLocal(species) {
+  return species &&
+    ShowdownEnhancedTooltip.ChaosData &&
+    ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(species)];
+}
 
 ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
   let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
@@ -642,9 +655,10 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 
   text += this.renderStats(clientPokemon, serverPokemon, !isActive);
 
+  text += '<p class="section">';
   if (serverPokemon && !isActive) {
+    text += '<strong>Known moves:</strong><br/>';
     // move list
-    text += `<p class="section">`;
     const battlePokemon = clientPokemon || this.battle.findCorrespondingPokemon(pokemon);
     for (const moveid of serverPokemon.moves) {
       const move = Dex.getMove(moveid);
@@ -665,10 +679,9 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
         '<br />';
       // *********************
     }
-    text += '</p>';
   } else if (!this.battle.hardcoreMode && clientPokemon && clientPokemon.moveTrack.length) {
     // move list (guessed)
-    text += `<p class="section"><strong>Known moves:</strong><br/>`;
+    text += '<strong>Known moves:</strong><br/>';
     for (const row of clientPokemon.moveTrack) {
       // *****************
       // Show move base power
@@ -690,32 +703,32 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     if (this.pokemonHasClones(clientPokemon)) {
       text += `(Your opponent has two indistinguishable Pokémon, making it impossible for you to tell which one has which moves/ability/item.) `;
     }
-
-    // Likely Moves
-    if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)]) {
-      const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)];
-      const movesTotal = sumObjectValues(pokemonChaosData.Moves);
-      const likelyMoves = Object.entries(pokemonChaosData.Moves)
-        .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
-        .slice(0, 7) // Only showing the 7 most likely moves
-        .filter(movesArray => {
-          for (const row of clientPokemon.moveTrack) {
-            let move = Dex.getMove(row[0]);
-            if (move.id === movesArray[0]) {
-              return false;
-            }
-          }
-          return true;
-        })
-        .map(movesArray => {
-          const movesLikelihood = Math.round(((movesArray[1] / movesTotal)*100) * 100) / 100;
-          const move = Dex.getMove(movesArray[0]);
-          return `${move.name} (${movesLikelihood}%) BP: ${move.basePower} ${Dex.getTypeIcon(move.type)} <img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />`;
-        });
-      text += `<br/><strong>Likely moves:</strong><br/>• ${likelyMoves.join('<br/> • ')}`;
-    }
-    text += `</p>`;
   }
+  // Likely Moves
+  const pokemonChaosData = getChaosDataFromLocal(pokemon.speciesForme);
+  if (pokemonChaosData) {
+    const movesTotal = sumObjectValues(pokemonChaosData.Moves);
+    const likelyMoves = Object.entries(pokemonChaosData.Moves)
+      .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
+      .slice(0, 7) // Only showing the 7 most likely moves
+      .filter(movesArray => {
+        for (const row of clientPokemon.moveTrack) {
+          let move = Dex.getMove(row[0]);
+          if (move.id === movesArray[0]) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map(movesArray => {
+        const movesLikelihood = Math.round(((movesArray[1] / movesTotal)*100) * 100) / 100;
+        const move = Dex.getMove(movesArray[0]);
+        return `${move.name} (${movesLikelihood}%) BP: ${move.basePower} ${Dex.getTypeIcon(move.type)} <img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />`;
+      });
+    text += `<strong>Likely moves:</strong><br/>• ${likelyMoves.join('<br/> • ')}`;
+  }
+
+  text += `</p>`;
 
   return text;
 };
@@ -742,9 +755,8 @@ ShowdownEnhancedTooltip.getPokemonAbilityText = function(
   }
   const pokemon = clientPokemon || serverPokemon;
 
-  if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)]) {
-    const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)];
-
+  const pokemonChaosData = getChaosDataFromLocal(pokemon.speciesForme);
+  if (pokemonChaosData) {
     // Enhanced Possible Abilities
     const abilityTotal = sumObjectValues(pokemonChaosData.Abilities);
     const likelyAbilities = Object.entries(pokemonChaosData.Abilities)

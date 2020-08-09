@@ -13,7 +13,8 @@
 	},
 	"background": {
 		"scripts": [
-			"/js/settingsMenu.js"
+			"/js/settingsMenu.js",
+			"/js/background.js"
 		]
 	},
 	"browser_action":{
@@ -22,6 +23,7 @@
 	"permissions": [
 		"contextMenus",
 		"storage",
+		"tabs",
 		"*://play.pokemonshowdown.com/*",
 		"*://*.psim.us/*"
 	],
