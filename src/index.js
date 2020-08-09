@@ -740,9 +740,10 @@ ShowdownEnhancedTooltip.getPokemonAbilityText = function(
       if (baseAbilityName && baseAbilityName !== abilityName) text += ' (base: ' + baseAbilityName + ')';
     }
   }
+  const pokemon = clientPokemon || serverPokemon;
 
-  if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(clientPokemon.speciesForme)]) {
-    const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(clientPokemon.speciesForme)];
+  if (ShowdownEnhancedTooltip.ChaosData && ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)]) {
+    const pokemonChaosData = ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(pokemon.speciesForme)];
 
     // Enhanced Possible Abilities
     const abilityTotal = sumObjectValues(pokemonChaosData.Abilities);
