@@ -442,22 +442,25 @@ function sumObjectValues(obj) {
   return Object.keys(obj).reduce((sum, key)=> sum+parseFloat(obj[key]||0), 0);
 }
 
-// Get all move data once when plugin loaded
 ShowdownEnhancedTooltip.ChaosData = null;
-const currentTier = app.curRoom.id.split('-')[1];
-const days = 36;
-const date = new Date();
-const last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
-const month = ('0' + (last.getMonth() + 1)).slice(-2);
-const year = last.getFullYear();
-fetchChaos(
-  { year, month },
-  { name: currentTier},
-  'https://cors-anywhere.herokuapp.com/'
-).then(chaos => {
-  ShowdownEnhancedTooltip.ChaosData = chaos.data;
-})
-.catch(console.error);
+ShowdownEnhancedTooltip.CurrentRoom = null;
+const getChaosData = () => {
+  if (app.curRoom.id !== ShowdownEnhancedTooltip.CurrentRoom) {
+    ShowdownEnhancedTooltip.CurrentRoom = app.curRoom.id;
+    const currentTier = app.curRoom.id.split('-')[1];
+    const days = 36;
+    const date = new Date();
+    const last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
+    const month = ('0' + (last.getMonth() + 1)).slice(-2);
+    const year = last.getFullYear();
+    fetchChaos(
+      { year, month },
+      { name: currentTier},
+      'https://cors-anywhere.herokuapp.com/'
+    ).then(chaos => ShowdownEnhancedTooltip.ChaosData = chaos.data)
+      .catch(console.error);
+  }
+}
 
 ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
   let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
@@ -488,6 +491,7 @@ ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
 }
 
 ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive, illusionIndex) {
+  getChaosData();
   const pokemon = clientPokemon || serverPokemon;
   let text = '';
   let genderBuf = '';
