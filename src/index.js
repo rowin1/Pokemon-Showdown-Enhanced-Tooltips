@@ -1,7 +1,9 @@
+const { fetchChaos } = require('smogon-usage-fetch');
+
 let ShowdownEnhancedTooltip = {};
 
 ShowdownEnhancedTooltip.Settings = {
-  showBaseStats: 'OFF',
+  showBaseStats: 'ON',
 };
 
 ShowdownEnhancedTooltip.BattleTypeChart = {
@@ -436,6 +438,45 @@ ShowdownEnhancedTooltip.BattleTypeChart = {
   },
 };
 
+ShowdownEnhancedTooltip.ChaosData = null;
+
+const getChaosData = (currentTier) => {
+  if (currentTier) {
+    const days = 36;
+    const date = new Date();
+    const last = new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
+    const month = ('0' + (last.getMonth() + 1)).slice(-2);
+    const year = last.getFullYear();
+    fetchChaos(
+      { year, month },
+      { name: currentTier},
+      'https://cors-anywhere.herokuapp.com/'
+    ).then(chaos => ShowdownEnhancedTooltip.ChaosData = chaos.data)
+      .catch(console.error);
+  }
+}
+
+if (app && app.curRoom && app.curRoom.id) {
+  const initialTier = app.curRoom.id.split('-')[1];
+  if (initialTier) {
+    getChaosData(initialTier);
+  }
+}
+
+addEventListener('currentTier', function (e) {
+  getChaosData(e.detail);
+}, false);
+
+function sumObjectValues(obj) {
+  return Object.keys(obj).reduce((sum, key)=> sum+parseFloat(obj[key]||0), 0);
+}
+
+function getChaosDataFromLocal(species) {
+  return species &&
+    ShowdownEnhancedTooltip.ChaosData &&
+    ShowdownEnhancedTooltip.ChaosData[BattleLog.escapeHTML(species)];
+}
+
 ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
   let buf = '<div class="statbar' + (this.siden ? ' lstatbar' : ' rstatbar') + '" style="display: none">';
   const ignoreNick = this.siden && (this.scene.battle.ignoreOpponent || this.scene.battle.ignoreNicks);
@@ -465,7 +506,6 @@ ShowdownEnhancedTooltip.getStatbarHTML = function getStatbarHTML(pokemon) {
 }
 
 ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientPokemon, serverPokemon, isActive, illusionIndex) {
-  var _this3 = this;
   const pokemon = clientPokemon || serverPokemon;
   let text = '';
   let genderBuf = '';
@@ -615,9 +655,10 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 
   text += this.renderStats(clientPokemon, serverPokemon, !isActive);
 
+  text += '<p class="section">';
   if (serverPokemon && !isActive) {
+    text += '<strong>Known moves:</strong><br/>';
     // move list
-    text += `<p class="section">`;
     const battlePokemon = clientPokemon || this.battle.findCorrespondingPokemon(pokemon);
     for (const moveid of serverPokemon.moves) {
       const move = Dex.getMove(moveid);
@@ -638,15 +679,14 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
         '<br />';
       // *********************
     }
-    text += '</p>';
   } else if (!this.battle.hardcoreMode && clientPokemon && clientPokemon.moveTrack.length) {
     // move list (guessed)
-    text += `<p class="section">`;
+    text += '<strong>Known moves:</strong><br/>';
     for (const row of clientPokemon.moveTrack) {
       // *****************
       // Show move base power
       var move = Dex.getMove(row[0]);
-      text += this.getPPUseText(row) + ' Base power: ' + move.basePower + ' ' +
+      text += this.getPPUseText(row) + ' BP: ' + move.basePower + ' ' +
         Dex.getTypeIcon(move.type) + ' ' +
         `<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
         '<br />';
@@ -663,10 +703,74 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     if (this.pokemonHasClones(clientPokemon)) {
       text += `(Your opponent has two indistinguishable Pokémon, making it impossible for you to tell which one has which moves/ability/item.) `;
     }
-    text += `</p>`;
   }
+  // Likely Moves
+  const pokemonChaosData = getChaosDataFromLocal(pokemon.speciesForme);
+  if (pokemonChaosData && clientPokemon) {
+    const movesTotal = sumObjectValues(pokemonChaosData.Moves);
+    const likelyMoves = Object.entries(pokemonChaosData.Moves)
+      .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
+      .slice(0, 7) // Only showing the 7 most likely moves
+      .filter(movesArray => {
+        for (const row of clientPokemon.moveTrack) {
+          let move = Dex.getMove(row[0]);
+          if (move.id === movesArray[0]) {
+            return false;
+          }
+        }
+        return true;
+      })
+      .map(movesArray => {
+        const movesLikelihood = Math.round(((movesArray[1] / movesTotal)*100) * 100) / 100;
+        const move = Dex.getMove(movesArray[0]);
+        return `${move.name} (${movesLikelihood}%) BP: ${move.basePower} ${Dex.getTypeIcon(move.type)} <img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />`;
+      });
+    text += `<strong>Likely moves:</strong><br/>• ${likelyMoves.join('<br/> • ')}`;
+  }
+
+  text += `</p>`;
+
   return text;
 };
+
+ShowdownEnhancedTooltip.getPokemonAbilityText = function(
+  clientPokemon,
+  serverPokemon,
+  isActive,
+  hidePossible
+) {
+  let text = '';
+  const abilityData = this.getPokemonAbilityData(clientPokemon, serverPokemon);
+  if (!isActive) {
+    // for switch tooltips, only show the original ability
+    const ability = abilityData.baseAbility || abilityData.ability;
+    if (ability) text = '<small>Ability:</small> ' + Dex.getAbility(ability).name;
+  } else {
+    if (abilityData.ability) {
+      const abilityName = Dex.getAbility(abilityData.ability).name;
+      text = '<small>Ability:</small> ' + abilityName;
+      const baseAbilityName = Dex.getAbility(abilityData.baseAbility).name;
+      if (baseAbilityName && baseAbilityName !== abilityName) text += ' (base: ' + baseAbilityName + ')';
+    }
+  }
+  const pokemon = clientPokemon || serverPokemon;
+
+  const pokemonChaosData = getChaosDataFromLocal(pokemon.speciesForme);
+  if (pokemonChaosData) {
+    // Enhanced Possible Abilities
+    const abilityTotal = sumObjectValues(pokemonChaosData.Abilities);
+    const likelyAbilities = Object.entries(pokemonChaosData.Abilities)
+      .sort((a, b) => (a[1] > b[1]) ? -1 : 1)
+      .map(abilityArray => {
+        const abilityLikelihood = Math.round(((abilityArray[1] / abilityTotal)*100) * 100) / 100;
+        return `${Dex.getAbility(abilityArray[0]).name} (${abilityLikelihood}%)`;
+      });
+    text = '<small>Possible abilities:</small> ' + likelyAbilities.join(', ');
+  } else if (!text && abilityData.possibilities.length && !hidePossible) {
+    text = '<small>Possible abilities:</small> ' + abilityData.possibilities.join(', ');
+  }
+  return text;
+}
 
 ShowdownEnhancedTooltip.getTypeEff = function(types){
   if (types.length == 1){
@@ -713,4 +817,5 @@ ShowdownEnhancedTooltip.getTypeEff = function(types){
 
 // Overwrite client tooltip method with enhanced tooltip method
 PokemonSprite.prototype.getStatbarHTML = ShowdownEnhancedTooltip.getStatbarHTML;
+BattleTooltips.prototype.getPokemonAbilityText = ShowdownEnhancedTooltip.getPokemonAbilityText;
 BattleTooltips.prototype.showPokemonTooltip = ShowdownEnhancedTooltip.showPokemonTooltip;
