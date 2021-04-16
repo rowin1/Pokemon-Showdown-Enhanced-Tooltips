@@ -650,7 +650,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
         Dex.getTypeIcon(move.type) + ' ' +
         `<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
         '<br />';
-      // ********************
+      // *******************
     }
     if (this.battle.gen < 8 && clientPokemon.moveTrack.filter(([moveName]) => {
       if (moveName.charAt(0) === '*') return false;
