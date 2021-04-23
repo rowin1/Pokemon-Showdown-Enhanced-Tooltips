@@ -589,17 +589,17 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
 
   let itemText = '';
   if (serverPokemon && serverPokemon.item) {
-    itemText = '<small>Item:</small> ' + Dex.getItem(serverPokemon.item).name;
+    itemText = '<small>Item:</small> ' + Dex.items.get(serverPokemon.item).name;
   } else if (clientPokemon) {
     let item = '';
     let itemEffect = clientPokemon.itemEffect || '';
     if (clientPokemon.prevItem) {
       item = 'None';
       if (itemEffect) itemEffect += '; ';
-      let prevItem = Dex.getItem(clientPokemon.prevItem).name;
+      let prevItem = Dex.items.get(clientPokemon.prevItem).name;
       itemEffect += clientPokemon.prevItemEffect ? prevItem + ' was ' + clientPokemon.prevItemEffect : 'was ' + prevItem;
     }
-    if (pokemon.item) item = Dex.getItem(pokemon.item).name;
+    if (pokemon.item) item = Dex.items.get(pokemon.item).name;
     if (itemEffect) itemEffect = ' (' + itemEffect + ')';
     if (item) itemText = '<small>Item:</small> ' + item + itemEffect;
   }
@@ -620,7 +620,7 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     text += `<p class="section">`;
     const battlePokemon = clientPokemon || this.battle.findCorrespondingPokemon(pokemon);
     for (const moveid of serverPokemon.moves) {
-      const move = Dex.getMove(moveid);
+      const move = Dex.moves.get(moveid);
       let moveName = `&#8226; ${move.name}`;
       if (battlePokemon && battlePokemon.moveTrack) {
         for (const row of battlePokemon.moveTrack) {
@@ -645,16 +645,18 @@ ShowdownEnhancedTooltip.showPokemonTooltip = function showPokemonTooltip(clientP
     for (const row of clientPokemon.moveTrack) {
       // *****************
       // Show move base power
-      var move = Dex.getMove(row[0]);
+      var move = Dex.moves.get(row[0]);
       text += this.getPPUseText(row) + ' Base power: ' + move.basePower + ' ' +
         Dex.getTypeIcon(move.type) + ' ' +
         `<img src="${Dex.resourcePrefix}sprites/categories/${move.category}.png" alt="${move.category}" />` +
         '<br />';
-      // *********************
+      // *******************
     }
-    if (this.battle.gen < 8 && clientPokemon.moveTrack.filter(([moveName]) =>
-      moveName.charAt(0) !== '*' && !this.battle.dex.getMove(moveName).isZ
-    ).length > 4) {
+    if (this.battle.gen < 8 && clientPokemon.moveTrack.filter(([moveName]) => {
+      if (moveName.charAt(0) === '*') return false;
+      const move = this.battle.dex.moves.get(moveName);
+      return !move.isZ && !move.isMax;
+    }).length > 4) {
       text += `(More than 4 moves is usually a sign of Illusion Zoroark/Zorua.) `;
     }
     if (this.battle.gen === 3) {
