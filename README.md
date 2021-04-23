@@ -1,6 +1,8 @@
-_Latest update July 17th, 2020!_
-[Chrome Download](https://chrome.google.com/webstore/detail/pok%C3%A9mon-showdown-enhanced/ehfemiiogehggdcmnpinokioccpijcfc)
-[Firefox Download](https://addons.mozilla.org/en-US/firefox/addon/pokemonshowdownenhancedtooltip/)
+Temporary download: https://github.com/rowin1/Pokemon-Showdown-Enhanced-Tooltips/files/6321919/pset-fix.zip
+Temporary installation method: go to chrome://extensions/ , enable developer mode in the top right corner, then click "load unpacked", then navigate to the chrome folder you extracted.
+
+-[Chrome Download](https://chrome.google.com/webstore/detail/pok%C3%A9mon-showdown-enhanced/ehfemiiogehggdcmnpinokioccpijcfc)
+-[Firefox Download](https://addons.mozilla.org/en-US/firefox/addon/pokemonshowdownenhancedtooltip/)
 
 # Pokemon-Showdown-Enhanced-Tooltips
 A Chrome Extension/Firefox Addon that enhances the tooltips on [Pokemon Showdown](http://play.pokemonshowdown.com/)  by displaying additional information:
